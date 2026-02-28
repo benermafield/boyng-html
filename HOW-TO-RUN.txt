@@ -1,0 +1,56 @@
+╔═══════════════════════════════════════════════════════════════╗
+║                    HOW TO RUN BOYNG GAME                      ║
+╚═══════════════════════════════════════════════════════════════╝
+
+⚠️  IMPORTANT: Don't open index.html directly!
+   Modern browsers block ES6 modules for security (CORS policy)
+
+┌───────────────────────────────────────────────────────────────┐
+│  OPTION 1: QUICK START (Easiest - Works Immediately!)        │
+└───────────────────────────────────────────────────────────────┘
+
+   1. Double-click:  start-game.html
+   2. That's it! The game loads in your browser.
+
+┌───────────────────────────────────────────────────────────────┐
+│  OPTION 2: Use Local Server (For Development)                │
+└───────────────────────────────────────────────────────────────┘
+
+   Windows:
+   1. Double-click:  server.bat
+   2. Open browser:  http://localhost:8000
+   3. Click:         index.html
+
+   Mac/Linux:
+   1. Open terminal in this folder
+   2. Run:  python3 -m http.server 8000
+   3. Open browser:  http://localhost:8000
+   4. Click:         index.html
+
+┌───────────────────────────────────────────────────────────────┐
+│  GAME CONTROLS                                                │
+└───────────────────────────────────────────────────────────────┘
+
+   ← / A       Move left
+   → / D       Move right
+   ↑ / W       Jump (when on ground)
+   ↓ / S       Slam down (hold for heavy gravity)
+   ESC         Return to menu
+
+   Menu: Arrow keys + Enter, or use your mouse
+
+┌───────────────────────────────────────────────────────────────┐
+│  TROUBLESHOOTING                                              │
+└───────────────────────────────────────────────────────────────┘
+
+   Problem: Blank screen or nothing happens
+   Solution: Use start-game.html or run local server
+            (Don't open index.html directly!)
+
+   Problem: No sound
+   Solution: Optional! Add .wav files to assets/sounds/
+            Game works fine without sound.
+
+   Need help? See README.md for full documentation.
+
+═══════════════════════════════════════════════════════════════

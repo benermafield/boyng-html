@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boyng - Bouncy Ball Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #0f0f1e;
+            font-family: Arial, sans-serif;
+        }
+        #game-container {
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container"></div>
+
+    <!-- Load Phaser 3 from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
+
+    <!-- Load game source files -->
+    <script src="src/entities/states/BallState.js"></script>
+    <script src="src/entities/states/BouncyBallState.js"></script>
+    <script src="src/entities/states/MetalBallState.js"></script>
+    <script src="src/entities/states/StickyBallState.js"></script>
+    <script src="src/entities/Ball.js"></script>
+    <script src="src/scenes/MenuScene.js"></script>
+    <script src="src/scenes/Level1Scene.js"></script>
+    <script src="src/main.js"></script>
+</body>
+</html>
