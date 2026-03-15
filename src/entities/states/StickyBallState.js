@@ -1,10 +1,14 @@
-class StickyBallState extends BallState {
-    getColor() { return 0x00cc44; }
+import { BallState } from './BallState.js';
+import { GameConfig } from '../../config.js';
+
+export class StickyBallState extends BallState {
+    getColor() { return GameConfig.stickyBall.color; }
 
     enter(ball) {
-        ball.setBounce(0);
-        ball.setDrag(0, 0);
-        ball.setMaxVelocity(400, 400);
+        const cfg = GameConfig.stickyBall;
+        ball.setBounce(cfg.bounce);
+        ball.setDrag(cfg.drag, 0);
+        ball.setMaxVelocity(cfg.maxVelX, cfg.maxVelY);
         ball.body.gravity.y = 0;
         ball.wasGrounded = false;
     }
@@ -15,9 +19,10 @@ class StickyBallState extends BallState {
     }
 
     update(ball) {
+        const cfg     = GameConfig.stickyBall;
         const cursors = ball.cursors;
-        const keys = ball.keys;
-        const body = ball.body;
+        const keys    = ball.keys;
+        const body    = ball.body;
 
         const onFloor   = body.blocked.down  || body.touching.down;
         const onCeiling = body.blocked.up    || body.touching.up;
@@ -29,7 +34,7 @@ class StickyBallState extends BallState {
         const onAnySurface = onHorizontalSurface || onVerticalSurface;
 
         if (onAnySurface) {
-            body.gravity.y = -900; // Cancel world gravity
+            body.gravity.y = cfg.gravityCancel; // Cancel world gravity
 
             const leftPressed  = cursors.left.isDown  || keys.A.isDown;
             const rightPressed = cursors.right.isDown || keys.D.isDown;
@@ -49,14 +54,14 @@ class StickyBallState extends BallState {
             // flags during an active collision, so without these the ball loses contact
             // on the next frame and gravity re-enables. Floors don't need this because
             // gravity provides the equivalent push automatically.
-            const wallPush    = onLeft ? -50 : onRight ? 50 : 0;
-            const ceilingPush = onCeiling ? -50 : 0;
+            const wallPush    = onLeft ? -cfg.wallPush : onRight ? cfg.wallPush : 0;
+            const ceilingPush = onCeiling ? -cfg.wallPush : 0;
 
             if (canMoveH) {
-                ball.setVelocityX(effectiveLeft ? -200 : 200);
+                ball.setVelocityX(effectiveLeft ? -cfg.moveSpeed : cfg.moveSpeed);
                 ball.setVelocityY(ceilingPush);
             } else if (canMoveV) {
-                ball.setVelocityY(effectiveUp ? -200 : 200);
+                ball.setVelocityY(effectiveUp ? -cfg.moveSpeed : cfg.moveSpeed);
                 ball.setVelocityX(wallPush);
             } else {
                 ball.setVelocityX(wallPush);

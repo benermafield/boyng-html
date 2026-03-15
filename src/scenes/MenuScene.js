@@ -1,14 +1,20 @@
-class MenuScene extends Phaser.Scene {
+import { GameConfig } from '../config.js';
+
+// Phaser is available as a browser global (loaded via CDN before this module runs)
+export class MenuScene extends Phaser.Scene {
     constructor() {
         super({ key: 'MenuScene' });
     }
 
     create() {
+        const ui  = GameConfig.ui;
+        const centerX = GameConfig.world.viewWidth / 2;
+
         // Title
-        this.add.text(400, 150, 'BOYNG', {
-            fontSize: '72px',
+        this.add.text(centerX, ui.titleY, 'BOYNG', {
+            fontSize: ui.titleFontSize,
             fontFamily: 'Arial Black',
-            color: '#ffffff'
+            color: ui.selectedColor
         }).setOrigin(0.5);
 
         // Menu options data
@@ -18,13 +24,14 @@ class MenuScene extends Phaser.Scene {
         ];
 
         this.selectedIndex = 0;
+        this.exitTextShown = false;
 
         // Create text objects for each option
         this.optionTexts = this.menuOptions.map((option, index) => {
-            const text = this.add.text(400, 300 + index * 60, option.text, {
-                fontSize: '32px',
+            const text = this.add.text(centerX, ui.optionStartY + index * ui.optionSpacing, option.text, {
+                fontSize: ui.optionFontSize,
                 fontFamily: 'Arial',
-                color: '#cccccc'
+                color: ui.defaultColor
             }).setOrigin(0.5).setInteractive();
 
             // Mouse hover event
@@ -69,26 +76,31 @@ class MenuScene extends Phaser.Scene {
     }
 
     updateSelection() {
+        const ui = GameConfig.ui;
         this.optionTexts.forEach((text, index) => {
             if (index === this.selectedIndex) {
-                text.setColor('#ffffff').setScale(1.1);
+                text.setColor(ui.selectedColor).setScale(ui.selectedScale);
             } else {
-                text.setColor('#cccccc').setScale(1.0);
+                text.setColor(ui.defaultColor).setScale(ui.defaultScale);
             }
         });
     }
 
     selectOption() {
+        const ui     = GameConfig.ui;
         const option = this.menuOptions[this.selectedIndex];
+        const centerX = GameConfig.world.viewWidth / 2;
 
         if (option.scene) {
             this.scene.start(option.scene);
         } else if (option.action === 'exit') {
-            // Show farewell message
-            this.add.text(400, 400, 'Thanks for playing!', {
-                fontSize: '24px',
-                color: '#ffffff'
-            }).setOrigin(0.5);
+            if (!this.exitTextShown) {
+                this.exitTextShown = true;
+                this.add.text(centerX, ui.exitTextY, 'Thanks for playing!', {
+                    fontSize: ui.exitFontSize,
+                    color: ui.selectedColor
+                }).setOrigin(0.5);
+            }
         }
     }
 }

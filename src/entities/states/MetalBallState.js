@@ -1,11 +1,15 @@
-class MetalBallState extends BallState {
-    getColor() { return 0xaaaaaa; }
+import { BallState } from './BallState.js';
+import { GameConfig } from '../../config.js';
+
+export class MetalBallState extends BallState {
+    getColor() { return GameConfig.metalBall.color; }
 
     enter(ball) {
-        ball.setBounce(0.2);
-        ball.setDrag(150, 0);
-        ball.setMaxVelocity(300, 600);
-        ball.body.gravity.y = 600;
+        const cfg = GameConfig.metalBall;
+        ball.setBounce(cfg.bounce);
+        ball.setDrag(cfg.drag, 0);
+        ball.setMaxVelocity(cfg.maxVelX, cfg.maxVelY);
+        ball.body.gravity.y = cfg.extraGravity;
     }
 
     exit(ball) {
@@ -13,36 +17,27 @@ class MetalBallState extends BallState {
     }
 
     update(ball) {
-        const cursors = ball.cursors;
-        const keys = ball.keys;
+        const cfg   = GameConfig.metalBall;
+        const input = BallState.getInputState(ball);
 
         // Horizontal movement (sluggish)
-        const leftPressed  = cursors.left.isDown  || keys.A.isDown;
-        const rightPressed = cursors.right.isDown || keys.D.isDown;
-
-        if (leftPressed) {
-            ball.setAccelerationX(-300);
-        } else if (rightPressed) {
-            ball.setAccelerationX(300);
+        if (input.leftPressed) {
+            ball.setAccelerationX(-cfg.accel);
+        } else if (input.rightPressed) {
+            ball.setAccelerationX(cfg.accel);
         } else {
             ball.setAccelerationX(0);
         }
 
         // Jump (low)
-        const isGrounded      = ball.body.blocked.down || ball.body.touching.down;
-        const jumpHeld        = cursors.up.isDown || keys.W.isDown;
-        const jumpJustPressed = Phaser.Input.Keyboard.JustDown(cursors.up) ||
-                                Phaser.Input.Keyboard.JustDown(keys.W);
-        const justLanded      = isGrounded && !ball.wasGrounded;
-
-        if (jumpJustPressed && isGrounded) {
-            ball.setVelocityY(-300);
+        if (input.jumpJustPressed && input.isGrounded) {
+            ball.setVelocityY(cfg.jumpVelocity);
             if (ball.jumpSound) ball.jumpSound.play();
-        } else if (justLanded && jumpHeld) {
-            ball.setVelocityY(-300);
+        } else if (input.justLanded && input.jumpHeld) {
+            ball.setVelocityY(cfg.landJumpVel);
             if (ball.jumpSound) ball.jumpSound.play();
         }
 
-        ball.wasGrounded = isGrounded;
+        ball.wasGrounded = input.isGrounded;
     }
 }

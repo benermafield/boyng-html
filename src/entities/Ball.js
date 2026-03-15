@@ -1,4 +1,10 @@
-class Ball extends Phaser.Physics.Arcade.Sprite {
+import { GameConfig } from '../config.js';
+import { BouncyBallState } from './states/BouncyBallState.js';
+import { MetalBallState } from './states/MetalBallState.js';
+import { StickyBallState } from './states/StickyBallState.js';
+
+// Phaser is available as a browser global (loaded via CDN before this module runs)
+export class Ball extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
         super(scene, x, y, '__DEFAULT');
 
@@ -10,7 +16,7 @@ class Ball extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
 
         // Configure base physics shape
-        this.setCircle(16);
+        this.setCircle(GameConfig.ball.radius);
         this.setOrigin(0.5, 0.5);
         this.setCollideWorldBounds(true);
 
@@ -38,11 +44,14 @@ class Ball extends Phaser.Physics.Arcade.Sprite {
         this.currentState = null;
 
         // Number key listeners (keys 1–9, keycodes 49–57)
+        this.numberKeys = [];
         for (let i = 1; i <= 9; i++) {
             const stateIndex = i;
-            scene.input.keyboard.addKey(48 + i).on('down', () => {
+            const keyObj = scene.input.keyboard.addKey(48 + i);
+            keyObj.on('down', () => {
                 if (this.states[stateIndex]) this.switchState(stateIndex);
             });
+            this.numberKeys.push(keyObj);
         }
 
         // Start in bouncy state
@@ -50,23 +59,26 @@ class Ball extends Phaser.Physics.Arcade.Sprite {
     }
 
     switchState(key) {
+        const nextState = this.states[key];
+        if (!nextState) return;
         if (this.currentState) this.currentState.exit(this);
-        this.currentState = this.states[key];
+        this.currentState = nextState;
         this.currentState.enter(this);
         this.regenerateTexture(this.currentState.getColor());
     }
 
     regenerateTexture(color) {
+        const r = GameConfig.ball.radius;
         const key = 'ball_' + color.toString(16).padStart(6, '0');
         if (!this.scene.textures.exists(key)) {
             const g = this.scene.add.graphics();
             g.fillStyle(color, 1);
-            g.fillCircle(16, 16, 16);
-            g.generateTexture(key, 32, 32);
+            g.fillCircle(r, r, r);
+            g.generateTexture(key, r * 2, r * 2);
             g.destroy();
         }
         this.setTexture(key);
-        this.setCircle(16); // Re-apply after setTexture (Phaser may reset body)
+        this.setCircle(r); // Re-apply after setTexture (Phaser may reset body)
     }
 
     update() {
@@ -84,7 +96,16 @@ class Ball extends Phaser.Physics.Arcade.Sprite {
              blocked.down  || blocked.left  || blocked.right  || blocked.up) &&
             this.bounceCooldown <= 0) {
             if (this.bounceSound) this.bounceSound.play();
-            this.bounceCooldown = 100;
+            this.bounceCooldown = GameConfig.audio.bounceCooldown;
         }
+    }
+
+    destroy(fromScene) {
+        const kb = this.scene.input.keyboard;
+        ['W', 'A', 'S', 'D'].forEach(k => kb.removeKey(this.keys[k]));
+        this.numberKeys.forEach(k => kb.removeKey(k));
+        if (this.jumpSound)   { this.jumpSound.destroy();   this.jumpSound   = null; }
+        if (this.bounceSound) { this.bounceSound.destroy(); this.bounceSound = null; }
+        super.destroy(fromScene);
     }
 }
